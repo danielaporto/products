@@ -1,10 +1,19 @@
-const index = (request, response) => {
-  return response.status(200).send('list in all products')
+const { productsRepository } = require('../repositories')
+
+const index = async (_request, response) => {
+  const allProducts = await productsRepository.getAllProducts()
+  return response.status(200).send(allProducts)
 }
 
-const show = (request, response) => {
-  const { params: { id } } = request
-  return response.status(200).send(`list for id product ${id}`)
+const show = async (request, response) => {
+  try {
+    const { params: { id } } = request
+    const product = await productsRepository.getProductById(id)
+    if (product) return response.status(200).send(product)
+    return response.status(404).send({ message: 'Não encontrado' })
+  } catch (error) {
+    return response.status(500).send({ message: 'Erro interno' })
+  }
 }
 
 module.exports = {
